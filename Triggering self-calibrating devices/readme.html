@@ -1,0 +1,251 @@
+<html>
+    <head>
+        <title>Xeneth SDK - Triggering self-calibrating devices</title>
+        <style type="text/css">
+            body
+            {
+                font-family: Arial;
+                font-size: 10pt;
+            }
+
+            .tb
+            {
+                border: 1px solid #000000;
+                width: 100%;
+
+                font-size: 10pt;
+
+                border-collapse: collapse;
+            }
+
+            .tb th
+            {
+                color: #FFFFFF;
+                background: #000000;
+            }
+
+            .tb td
+            {
+                background: #FBFCFD;
+                padding-left: 5px;
+            }
+
+            .tb .rtitle
+            {
+                font-weight: bold;
+                text-align: left;
+            }
+            
+            dt {
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="content">
+            <sub>Supported OS: Windows, Linux</sub>
+            <p>
+                <h2>Set-up</h2>
+                <dl>
+                    <dt>Camera</dt>
+                    <dd>
+                        <ul>
+                            <li>Xenics Gobi-640 GigE Vision (F027)</li>
+                            <li>Configured in external triggered mode with trigger activation on the rising edge.</li>
+                        </ul>
+                    </dd>
+                </dl>
+                <dl>
+                    <dt>Function generator</dt>
+                    <dd>
+                        <ul>
+                            <li>Tektronix AFG3102 Dual channel arbitrary/function generator</li>
+                            <li>50Hz Square 3.3Vpp with 1.65V offset configured to generate a burst of 100 cycles</li>
+                        </ul>
+                    </dd>
+                </dl>
+            </p>
+            <p>
+                <h2>Description</h2>
+                <p>
+                    In this sample we demonstrate how to configure and use a Gobi-640 GigE Vision (F027) camera for triggering using an external trigger source.
+                    With this camera care has to be taken about the shutter operation and when the self-calibrating procedure executes.
+                    A synchronous procedure is presented where the calibration process is controlled between trigger bursts to make sure the acquired image is of the best possible quality.
+                </p>
+                <p>
+                    The first part of the sample establishes a connection and makes sure we are connected to the correct camera by checking the camera's product id. If the correct camera was connected the program continues to configure the trigger and shutter operation.
+                </p>
+                
+                <p>
+                    <h3>Setup external triggered mode</h3>
+                    In this sample the trigger input is configured such that activation happens on the rising edge of the trigger input signal. The first things we take care of is disabling the trigger output and putting the trigger direction to input. When this is done the properties to describe the trigger signal are configured after which the trigger input can be enabled.
+                </p>
+                <table class="tb">
+                    <thead>
+                        <tr>
+                            <th width="150">Property</th>
+                            <th align="left" valign="top" width="150">Value</th>
+                            <th align="left">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">TriggerOutEnable</td>
+                            <td align="left" valign="top">Disabled (0)</td>
+                            <td align="left">Enable / Disable the trigger output.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">TriggerDirection</td>
+                            <td align="left" valign="top">TriggerInput (0)</td>
+                            <td align="left">Selects whether the trigger connector is used as an input trigger or an output trigger.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">TriggerInMode</td>
+                            <td align="left" valign="top">ExternalTriggered (1)</td>
+                            <td align="left">Sets the current trigger mode.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">TriggerInSensitivity</td>
+                            <td align="left" valign="top">Edge (1)</td>
+                            <td align="left">Defines whether the camera captures an image when the signal changes (edge) or when the signal is constant (level).</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">TriggerInPolarity</td>
+                            <td align="left" valign="top">HighRising (1)</td>
+                            <td align="left">When the Sensitivity is level this defines whether images are captured if the signal is high or low. Otherwise, an image is captured when the signal goes up or down.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">TriggerInDelay</td>
+                            <td align="left" valign="top">0</td>
+                            <td align="left">The incoming trigger is delayed with the set value. </td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">TriggerInSkip</td>
+                            <td align="left" valign="top">0</td>
+                            <td align="left">Skip n triggers before capturing an image. </td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">TriggerInTiming</td>
+                            <td align="left" valign="top">Optimal (0)</td>
+                            <td align="left">Using Optimal the image quality is not affected by the trigger sequence. This can be at the cost of an additional delay.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">TriggerInEnable</td>
+                            <td align="left" valign="top">Enabled (1)</td>
+                            <td align="left">Enable / Disable the trigger input.</td>
+                        </tr>                        
+                    </tbody>
+                </table>
+                
+                <p>
+                    <h3>Setup shutter control</h3>
+                    Because the Gobi-640 has an automatic self-calibrating procedure using a shutter it is possible that during trigger bursts the operation executes which can cause triggers to be missed. Because of this it is necessary to control the shutter such that calibration happens on intervals controlled by the user.                    
+                </p>
+                <table class="tb">
+                    <thead>
+                        <tr>
+                            <th width="150">Property</th>
+                            <th align="left" valign="top" width="150">Value</th>
+                            <th align="left">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">AutoCorrectionEnabled</td>
+                            <td align="left" valign="top">Disabled (0)</td>
+                            <td align="left">Enable / Disable the automatic internal calibration.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                <h3>Execute calibration</h3>
+                To make sure the image does not drift and stays corrected between bursts the camera has to be occasionally calibrated by stopping / starting the acquisition or by executing the "Calibrate"-property between bursts by setting its value to 1. After execution was started the user should wait a sufficient amount of time to make sure the operation has completed before starting a burst of triggers.<br />
+                <br />
+                In the case that automatic correction was enabled the calibration operation occurs every 150 seconds or when the devices temperature deviates 0.5 degrees from the last measured point.
+                </p>
+                <table class="tb">
+                    <thead>
+                        <tr>
+                            <th width="150">Property</th>
+                            <th align="left" valign="top" width="150">Value</th>
+                            <th align="left">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">Calibrate</td>
+                            <td align="left" valign="top">Execute (1)</td>
+                            <td align="left">Forces the camera to update the internal calibration data.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </p>            
+            <h2>Used functions</h2>
+            <p>The following table lists the functions used in this sample:</p>
+            <p>
+                <table class="tb">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th align="left">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_OpenCamera</td>
+                            <td align="left">Opens a connection to the camera specified and returns a handle pointing to the camera. The handle is used in all other functions so keep a reference. </td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_CloseCamera</td>
+                            <td align="left">Closes and cleans up the connection to the camera specified by the handle which was obtained by calling the XC_OpenCamera function.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_IsInitialised</td>
+                            <td align="left">Check if the connection was successfully initialized.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_IsCapturing</td>
+                            <td align="left">Check if the SDK is capturing frames.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_StartCapture</td>
+                            <td align="left">Start capturing frames.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_StopCapture</td>
+                            <td align="left">Stop capturing frames.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_GetFrame</td>
+                            <td align="left">Used to grab a raw frame from the device.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_GetFrameSize</td>
+                            <td align="left">Used to determine the native frame size.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_GetMaxWidth</td>
+                            <td align="left">Used to grab a raw frame from the device.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_GetMaxHeight</td>
+                            <td align="left">Used to determine the native frame size.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_SetPropertyValueL</td>
+                            <td align="left">Sets an integer typed value in the discovery properties system.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_GetPropertyValueL</td>
+                            <td align="left">Gets an integer typed value from the discovery properties system.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_ErrorToString</td>
+                            <td align="left">Converts an error code to a string.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </p>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,140 @@
+<html>
+    <head>
+        <title>Xeneth SDK - Properties - enumerations</title>
+        <style type="text/css">
+            body
+            {
+                font-family: Arial;
+                font-size: 10pt;
+            }
+            
+            .tb
+            {
+                border: 1px solid #000000;
+                width: 100%;
+            
+                font-size: 10pt;
+                
+                border-collapse: collapse;
+            }
+            
+            .tb th
+            {
+                color: #FFFFFF;
+                background: #000000;
+            }
+            
+            .tb td
+            {
+                background: #FBFCFD;
+                padding-left: 5px;
+            }
+            
+            .tb .rtitle
+            {
+                font-weight: bold;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="content">
+            <sub>Supported OS: Windows, Linux</sub>
+            <h2>Description</h2>
+            <p>
+                Xeneth 2.6 introduces new functions to the property system to work with enumerations.
+                More specifically, it is now possible to use the enumeration's entry names instead of indexes.
+                For this reason a new version of the property system functions have been introduced: XC_GetPropertyRangeE, XC_GetPropertyValueE and XC_SetPropertyValueE.
+                To keep backwards compatibility with older code the XC_GetPropertyValue and XC_GetPropertyValueL their behaviour has not changed with this introduction.
+            </p>
+            <p>
+                In this sample we start by retrieving the current property range of the BitShift property. 
+                The following table holds the possible entry and display names of this property.
+                <h3>Enumeration entries for BitShift:</h3>
+                <table class="tb" width="100">
+                    <thead> 
+                        <tr>
+                            <th align="center" style="width: 100px">Entry index</th> 
+                            <th align="center" style="width: 150px">Entry name</th> 
+                            <th align="left">Entry display name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td align="center">0</td> 
+                            <td align="center">camera12bit</td> 
+                            <td align="left">4 bits (12 bit camera)</td>
+                        </tr>
+                        <tr>
+                            <td align="center">1</td> 
+                            <td align="center">camera14bit</td> 
+                            <td align="left">6 bits (14 bit camera)</td>
+                        </tr>
+                        <tr>
+                            <td align="center">2</td>
+                            <td align="center">camera16bit</td> 
+                            <td align="left">8 bits (16 bit camera)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </p>
+            <p>
+                When calling the XC_GetPropertyRangeE-function the range for the BitShift property is returned using the following format. <br />
+                <p>
+                    "<code>camera12bit=4 bits (12 bit camera),camera14bit=6 bits (14 bit camera),camera16bit=8 bits (16 bit camera)</code>"
+                </p>
+                This string exists of multiple key-value pairs delimited by a comma-character ",". 
+                Each entity of the key-value pair is delimited by an 'equals sign'-character "=".
+                Because the comma and equals sign are reserved characters it is necessary to encode these characters in the display name.
+                For this the display name is encoded using a similar technique to entity encoding.
+                The format is &amp;nnn; where nnn is the code for a printable character in decimal form.
+            </p>
+            <p>
+                In this sample two utility functions are provided to help parse the property range.
+                These are the FindFirstPropertyRangePair and FindNextPropertyRangePair functions.
+                Use the FindFirstPropertyRangePair function to start a new parsing session.
+                On successful return each consecutive entry can be parsed using the FindNextPropertyRangePair until the function returns false.
+                For each successful call the enumEntryName and enumEntryDisplayName arguments contain the values of the next entry.
+            </p>
+            <p>
+                After the range has been retrieved and parsed the sample demonstrates the usage of the XC_GetPropertyValueE and XC_SetPropertyValueE functions.
+                First the current value is retrieved, the default value for the virtual cameras will be "camera12bit". 
+                After the value is retrieved, and printed to the console output, the property will be programmed with a new value, "camera16bit".
+            </p>
+            <h2>Used functions</h2>
+            <p>The following table lists the functions used in this sample:</p>
+            <p>
+                <table class="tb">
+                    <thead> 
+                        <tr>
+                            <th>Function</th> 
+                            <th align="left">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_OpenCamera</td> 
+                            <td align="left">Opens a connection to the camera specified and returns a handle pointing to the camera. The handle is used in all other functions so keep a reference.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_CloseCamera</td> 
+                            <td align="left">Closes and cleans up the connection to the camera specified by the handle which was obtained by calling the XC_OpenCamera function.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_GetPropertyRangeE</td> 
+                            <td align="left">Retrieve the list of entries for an enumeration property.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_GetPropertyValueE</td> 
+                            <td align="left">Retrieves the named entry corresponding to the current value of an enumeration property.</td>
+                        </tr>
+                        <tr align="center">
+                            <td valign="top" class="rtitle">XC_SetPropertyValueE</td> 
+                            <td align="left">Sets the value of an enumeration property using the name of the enumeration entry.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </p>
+        </div>
+    </body>
+</html>
